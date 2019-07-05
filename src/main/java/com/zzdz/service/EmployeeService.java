@@ -12,6 +12,10 @@ import java.util.List;
  */
 public interface EmployeeService {
 
+    Integer add(Employee employee);
+
+    Integer delete(Employee employee);
+
     Employee get(Long id);
 
     List<Employee> getAll();
