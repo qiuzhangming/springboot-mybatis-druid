@@ -13,7 +13,12 @@ import java.util.Map;
 
 /**
  * @Classname DruidConfig
- * @Description TODO
+ * @Description 配置druid的监控，已经在配置文件设置过。这里不用再配置
+ *
+ * 访问url：http://localhost:8080/druid
+ * 用户名：admin
+ * 密  码：admin
+ *
  * @Date 2019/7/3 9:37
  * @Created by joe
  */
