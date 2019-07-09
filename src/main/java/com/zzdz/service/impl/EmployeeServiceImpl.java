@@ -3,6 +3,8 @@ package com.zzdz.service.impl;
 import com.zzdz.Dao.EmployeeDao;
 import com.zzdz.entity.Employee;
 import com.zzdz.service.EmployeeService;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -46,5 +48,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<Employee> getAll() {
         return employeeDao.selectAll();
+    }
+
+
+    @RabbitListener(queues = "test")
+    public void receive1(Employee employee) {
+        System.out.println(employee);
+    }
+
+    @RabbitListener(queues = "test")
+    public void receive2(Message message) {
+        System.out.println(message.getMessageProperties());
+        System.out.println(message.getBody());
     }
 }
