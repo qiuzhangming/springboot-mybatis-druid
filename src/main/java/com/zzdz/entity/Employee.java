@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @Classname Employee
@@ -18,7 +19,7 @@ import javax.persistence.Id;
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
-public class Employee {
+public class Employee implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,8 @@ public class Employee {
     private String nickName;
     private Integer age;
 
-    public Employee(String nickName) {
+    public Employee(String nickName, Integer age) {
         this.nickName = nickName;
+        this.age = age;
     }
 }
