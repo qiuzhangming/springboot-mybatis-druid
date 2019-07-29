@@ -1,5 +1,6 @@
 package com.zzdz.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
@@ -26,9 +27,35 @@ public class Employee implements Serializable {
     private Long id;
     private String nickName;
     private Integer age;
+    private Double salary;
+
+    private Status status;
+
+    public Employee(String nickName) {
+        this.nickName = nickName;
+    }
 
     public Employee(String nickName, Integer age) {
         this.nickName = nickName;
         this.age = age;
+    }
+
+    public Employee(String nickName, Integer age, Double salary) {
+        this.nickName = nickName;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    public Employee(String nickName, Integer age, Double salary, Status status) {
+        this.nickName = nickName;
+        this.age = age;
+        this.salary = salary;
+        this.status = status;
+    }
+
+    public enum Status {
+        FREE,
+        BUSY,
+        VOCATION
     }
 }
