@@ -8,8 +8,8 @@ package com.zzdz.sharding;
  */
 
 import com.google.common.collect.Range;
-import io.shardingsphere.api.algorithm.sharding.RangeShardingValue;
-import io.shardingsphere.api.algorithm.sharding.standard.RangeShardingAlgorithm;
+import org.apache.shardingsphere.api.sharding.standard.RangeShardingAlgorithm;
+import org.apache.shardingsphere.api.sharding.standard.RangeShardingValue;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,28 +26,34 @@ public class TimeRangeShardingAlgorithm implements RangeShardingAlgorithm<Long> 
     @Override
     public Collection<String> doSharding(Collection<String> availableTargetNames, RangeShardingValue<Long> shardingValue) {
         Collection<String> result = new LinkedHashSet<>();
-        Range<Long> shardingKey = shardingValue.getValueRange();
-        long startShardingKey = shardingKey.lowerEndpoint();
-        long endShardingKey = shardingKey.upperEndpoint();
-        //获取到开始时间戳
-        String startTimeString = ParaseShardingKeyTool.getYearAndMonth(startShardingKey);
-        //获取结束时间戳
-        String endTimeString = ParaseShardingKeyTool.getYearAndMonth(endShardingKey);
-        Calendar cal = Calendar.getInstance();
-        //获取开始的年月
-        //时间戳
-        LocalDateTime startLocalDate = GenericTool.getLocalDate(startTimeString);
-        //获取结束的年月
-        LocalDateTime endLocalDate = GenericTool.getLocalDate(endTimeString);
-        //进行判断 获取跨月份的表 如201901,201902,201903 三个月的表
-        int end = Integer.valueOf(dateformat.format(endLocalDate));
-        int start = Integer.valueOf(dateformat.format(startLocalDate));
-        while(start < end){
-            StringBuffer tableName = new StringBuffer();
-            tableName.append(shardingValue.getLogicTableName())
-                    .append("_").append(start);
-            result.add(tableName.toString());
-        }
+
+        result.add("employee0");
+//        result.add("employee1");
         return result;
+
+
+//        Range<Long> shardingKey = shardingValue.getValueRange();
+//        long startShardingKey = shardingKey.lowerEndpoint();
+//        long endShardingKey = shardingKey.upperEndpoint();
+//        //获取到开始时间戳
+//        String startTimeString = ParaseShardingKeyTool.getYearAndMonth(startShardingKey);
+//        //获取结束时间戳
+//        String endTimeString = ParaseShardingKeyTool.getYearAndMonth(endShardingKey);
+//        Calendar cal = Calendar.getInstance();
+//        //获取开始的年月
+//        //时间戳
+//        LocalDateTime startLocalDate = GenericTool.getLocalDate(startTimeString);
+//        //获取结束的年月
+//        LocalDateTime endLocalDate = GenericTool.getLocalDate(endTimeString);
+//        //进行判断 获取跨月份的表 如201901,201902,201903 三个月的表
+//        int end = Integer.valueOf(dateformat.format(endLocalDate));
+//        int start = Integer.valueOf(dateformat.format(startLocalDate));
+//        while(start < end){
+//            StringBuffer tableName = new StringBuffer();
+//            tableName.append(shardingValue.getLogicTableName())
+//                    .append("_").append(start);
+//            result.add(tableName.toString());
+//        }
+//        return result;
     }
 }

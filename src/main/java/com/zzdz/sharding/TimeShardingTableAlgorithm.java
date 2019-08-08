@@ -1,8 +1,7 @@
 package com.zzdz.sharding;
 
-
-import io.shardingsphere.api.algorithm.sharding.PreciseShardingValue;
-import io.shardingsphere.api.algorithm.sharding.standard.PreciseShardingAlgorithm;
+import org.apache.shardingsphere.api.sharding.standard.PreciseShardingAlgorithm;
+import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -13,12 +12,12 @@ import java.util.Collection;
  * @Date 2019/8/8 13:06
  * @Created by joe
  */
-public class TimeShardingTableAlgorithm implements PreciseShardingAlgorithm<Long> {
+public class TimeShardingTableAlgorithm implements PreciseShardingAlgorithm<Integer> {
     private DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("yyyyMM");
 
     @Override
-    public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Long> shardingValue) {
-        Long value = shardingValue.getValue();
+    public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Integer> shardingValue) {
+        Integer value = shardingValue.getValue();
         String logicTableName = shardingValue.getLogicTableName();
 //        String yearAndMonth = ParaseShardingKeyTool.getYearAndMonth(value);
         String yearAndMonth = (value.hashCode() & Integer.MAX_VALUE % 2)+"";

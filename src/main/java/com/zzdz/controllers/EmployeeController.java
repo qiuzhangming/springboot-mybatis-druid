@@ -4,7 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zzdz.entity.Employee;
 import com.zzdz.service.EmployeeService;
-import io.shardingsphere.core.keygen.DefaultKeyGenerator;
+import org.apache.shardingsphere.core.strategy.keygen.SnowflakeShardingKeyGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,7 @@ public class EmployeeController {
 
     @GetMapping("/add")
     public Integer add(Employee employee) {
-        DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator();
+        SnowflakeShardingKeyGenerator defaultKeyGenerator = new SnowflakeShardingKeyGenerator();
         employee.setId((Long) defaultKeyGenerator.generateKey());
         Integer r= employeeService.add(employee);
         System.out.println(employee);
@@ -44,6 +44,22 @@ public class EmployeeController {
         return employeeService.get(id);
     }
 
+    @GetMapping("/find/{age}")
+    public List<Employee> findByAge(@PathVariable("age") Integer age) {
+        return employeeService.findByAge(age);
+    }
+
+    @GetMapping("/find2")
+    public List<Employee> find2(Integer start, Integer end) {
+        return employeeService.findByAgeRange(start,end);
+    }
+
+    @GetMapping("/find3")
+    public List<Employee> find3(Integer age, Long id) {
+        return employeeService.findByAgeAndId(age, id);
+    }
+
+    //http://localhost:8080/getAll?pageNum=1&pageSize=7
     @GetMapping("/getAll")
     public PageInfo<Employee> getAll(int pageNum, int pageSize) {
         PageHelper.startPage(pageNum,pageSize);

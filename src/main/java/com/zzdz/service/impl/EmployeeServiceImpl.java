@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -44,6 +45,33 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee get(Long id) {
         return employeeDao.selectByPrimaryKey(id);
     }
+
+    @Override
+    public List<Employee> findByAge(Integer age) {
+        Example example = new Example(Employee.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("age", age);
+        return employeeDao.selectByExample(example);
+    }
+
+    @Override
+    public List<Employee> findByAgeRange(Integer minAge, Integer maxAge) {
+        Example example = new Example(Employee.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andBetween("age", minAge, maxAge);
+        return employeeDao.selectByExample(example);
+    }
+
+
+    @Override
+    public List<Employee> findByAgeAndId(Integer age, Long id) {
+        Example example = new Example(Employee.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("age", age);
+        criteria.andEqualTo("id", id);
+        return employeeDao.selectByExample(example);
+    }
+
 
     @Override
     public List<Employee> getAll() {

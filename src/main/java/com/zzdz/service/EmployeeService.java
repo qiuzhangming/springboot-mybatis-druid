@@ -18,5 +18,11 @@ public interface EmployeeService {
 
     Employee get(Long id);
 
+    List<Employee> findByAge(Integer age);
+
+    List<Employee> findByAgeRange(Integer minAge, Integer maxAge);
+
+    List<Employee> findByAgeAndId(Integer age, Long id);
+
     List<Employee> getAll();
 }
