@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zzdz.entity.Employee;
 import com.zzdz.service.EmployeeService;
+import io.shardingsphere.core.keygen.DefaultKeyGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,8 @@ public class EmployeeController {
 
     @GetMapping("/add")
     public Integer add(Employee employee) {
+        DefaultKeyGenerator defaultKeyGenerator = new DefaultKeyGenerator();
+        employee.setId((Long) defaultKeyGenerator.generateKey());
         Integer r= employeeService.add(employee);
         System.out.println(employee);
         return r;
