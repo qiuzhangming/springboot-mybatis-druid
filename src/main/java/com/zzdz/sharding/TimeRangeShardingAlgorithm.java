@@ -11,9 +11,11 @@ import com.google.common.collect.Range;
 import org.apache.shardingsphere.api.sharding.standard.RangeShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.standard.RangeShardingValue;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -22,38 +24,58 @@ import java.util.LinkedHashSet;
  * 范围搜索时（跨表）应传递时间戳并左移22位
  */
 public class TimeRangeShardingAlgorithm implements RangeShardingAlgorithm<Long> {
-    private DateTimeFormatter dateformat = DateTimeFormatter.ofPattern("yyyyMM");
+
     @Override
     public Collection<String> doSharding(Collection<String> availableTargetNames, RangeShardingValue<Long> shardingValue) {
         Collection<String> result = new LinkedHashSet<>();
 
-        result.add("employee0");
-//        result.add("employee1");
+        String logicTableName = shardingValue.getLogicTableName();
+        Range<Long> valueRange = shardingValue.getValueRange();
+        Long start = valueRange.lowerEndpoint();
+        Long stop = valueRange.upperEndpoint();
+
+        Collection<String> suffixs = tableSuffix(start, stop);
+        for (String suffix : suffixs) {
+            result.add(logicTableName + "_" + suffix);
+        }
         return result;
+    }
 
+    /**
+     * 计算时间范围的表的后缀
+     * @param startTime
+     * @param stopTime
+     * @return
+     */
+    public static Collection<String> tableSuffix(Long startTime, Long stopTime) {
 
-//        Range<Long> shardingKey = shardingValue.getValueRange();
-//        long startShardingKey = shardingKey.lowerEndpoint();
-//        long endShardingKey = shardingKey.upperEndpoint();
-//        //获取到开始时间戳
-//        String startTimeString = ParaseShardingKeyTool.getYearAndMonth(startShardingKey);
-//        //获取结束时间戳
-//        String endTimeString = ParaseShardingKeyTool.getYearAndMonth(endShardingKey);
-//        Calendar cal = Calendar.getInstance();
-//        //获取开始的年月
-//        //时间戳
-//        LocalDateTime startLocalDate = GenericTool.getLocalDate(startTimeString);
-//        //获取结束的年月
-//        LocalDateTime endLocalDate = GenericTool.getLocalDate(endTimeString);
-//        //进行判断 获取跨月份的表 如201901,201902,201903 三个月的表
-//        int end = Integer.valueOf(dateformat.format(endLocalDate));
-//        int start = Integer.valueOf(dateformat.format(startLocalDate));
-//        while(start < end){
-//            StringBuffer tableName = new StringBuffer();
-//            tableName.append(shardingValue.getLogicTableName())
-//                    .append("_").append(start);
-//            result.add(tableName.toString());
-//        }
-//        return result;
+        DateTimeFormatter yearAndMonthAndDay =  DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        Collection<String> result = new LinkedHashSet<>();
+
+        // 如果结束时间小于开始时间
+        if (stopTime < startTime) {
+            return result;
+        }
+
+        LocalDateTime localDateTime1 = LocalDateTime.ofInstant(Instant.ofEpochSecond(startTime), ZoneId.systemDefault());
+        LocalDateTime localDateTime2 = LocalDateTime.ofInstant(Instant.ofEpochSecond(stopTime), ZoneId.systemDefault());
+
+        //先加入开始时间和结束时间对应的表后缀
+        result.add(yearAndMonthAndDay.format(localDateTime1));
+        result.add(yearAndMonthAndDay.format(localDateTime2));
+
+        //两个时间的时间差
+        long tempSeconds = Duration.between(localDateTime1, localDateTime2).getSeconds();
+        int timeDiff = (int) tempSeconds / 60;
+        //不能整除就加1
+        if (tempSeconds % 60 != 0) {
+            timeDiff++;
+        }
+        if (timeDiff > 1 ) {
+            for (int i = 1; i < timeDiff; i++) {
+                result.add(localDateTime1.plusMinutes(i).format(yearAndMonthAndDay));
+            }
+        }
+        return result;
     }
 }

@@ -29,8 +29,10 @@ public class EmployeeController {
     public Integer add(Employee employee) {
         SnowflakeShardingKeyGenerator defaultKeyGenerator = new SnowflakeShardingKeyGenerator();
         employee.setId((Long) defaultKeyGenerator.generateKey());
+        employee.setAddTime(System.currentTimeMillis()/1000);
+        System.out.println("=========================="+employee);
+
         Integer r= employeeService.add(employee);
-        System.out.println(employee);
         return r;
     }
 
@@ -44,19 +46,24 @@ public class EmployeeController {
         return employeeService.get(id);
     }
 
-    @GetMapping("/find/{age}")
-    public List<Employee> findByAge(@PathVariable("age") Integer age) {
-        return employeeService.findByAge(age);
+    @GetMapping("/find1")
+    public List<Employee> findByAge(Long addtime) {
+        return employeeService.findByAddTime(addtime);
     }
 
     @GetMapping("/find2")
-    public List<Employee> find2(Integer start, Integer end) {
-        return employeeService.findByAgeRange(start,end);
+    public List<Employee> find2(Long start, Long end) {
+        return employeeService.findByAddTimeRange(start,end);
     }
 
     @GetMapping("/find3")
-    public List<Employee> find3(Integer age, Long id) {
-        return employeeService.findByAgeAndId(age, id);
+    public List<Employee> find3(Long addtime, String name) {
+        return employeeService.findByAddTimeAndName(addtime, name);
+    }
+
+    @GetMapping("/find4")
+    public List<Employee> find4(Long addtime, String name, Integer age) {
+        return employeeService.findByAddTimeAndNameAndAge(addtime, name, age);
     }
 
     //http://localhost:8080/getAll?pageNum=1&pageSize=7

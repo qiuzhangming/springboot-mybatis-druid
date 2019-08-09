@@ -47,31 +47,39 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public List<Employee> findByAge(Integer age) {
+    public List<Employee> findByAddTime(Long addTime) {
         Example example = new Example(Employee.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("age", age);
+        criteria.andEqualTo("addTime", addTime);
         return employeeDao.selectByExample(example);
     }
 
     @Override
-    public List<Employee> findByAgeRange(Integer minAge, Integer maxAge) {
+    public List<Employee> findByAddTimeRange(Long start, Long end) {
         Example example = new Example(Employee.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andBetween("age", minAge, maxAge);
+        criteria.andBetween("addTime", start, end);
         return employeeDao.selectByExample(example);
     }
-
 
     @Override
-    public List<Employee> findByAgeAndId(Integer age, Long id) {
+    public List<Employee> findByAddTimeAndName(Long addTime, String name) {
         Example example = new Example(Employee.class);
         Example.Criteria criteria = example.createCriteria();
-        criteria.andEqualTo("age", age);
-        criteria.andEqualTo("id", id);
+        criteria.andEqualTo("addTime", addTime);
+        criteria.andEqualTo("nickName", name);
         return employeeDao.selectByExample(example);
     }
 
+    @Override
+    public List<Employee> findByAddTimeAndNameAndAge(Long addTime, String name, Integer age) {
+        Example example = new Example(Employee.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("addTime", addTime);
+        criteria.andEqualTo("nickName", name);
+        criteria.andEqualTo("age", age);
+        return employeeDao.selectByExample(example);
+    }
 
     @Override
     public List<Employee> getAll() {

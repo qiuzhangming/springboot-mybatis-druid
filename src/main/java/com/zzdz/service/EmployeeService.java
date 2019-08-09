@@ -18,11 +18,10 @@ public interface EmployeeService {
 
     Employee get(Long id);
 
-    List<Employee> findByAge(Integer age);
-
-    List<Employee> findByAgeRange(Integer minAge, Integer maxAge);
-
-    List<Employee> findByAgeAndId(Integer age, Long id);
+    List<Employee> findByAddTime(Long addTime);
+    List<Employee> findByAddTimeRange(Long start, Long end);
+    List<Employee> findByAddTimeAndName(Long addTime, String name);
+    List<Employee> findByAddTimeAndNameAndAge(Long addTime, String name, Integer age);
 
     List<Employee> getAll();
 }

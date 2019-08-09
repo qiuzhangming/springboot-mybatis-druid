@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class ParaseShardingKeyTool {
     private static DateTimeFormatter yearAndMonth =  DateTimeFormatter.ofPattern("yyyyMM");
     private static  DateTimeFormatter year = DateTimeFormatter.ofPattern("yyyy");
+
     public static String getYearAndMonth(long shardingKey){
         Instant instant =  Instant.ofEpochMilli(SnowflakeShardingKeyGenerator.EPOCH+(Long.valueOf(shardingKey+"")>>22));
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());

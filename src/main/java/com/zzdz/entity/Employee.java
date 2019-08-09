@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Accessors(chain = true)
 public class Employee implements Serializable {
 
@@ -28,6 +29,7 @@ public class Employee implements Serializable {
     private String nickName;
     private Integer age;
     private Double salary;
+    private Long addTime;
 
     private Status status;
 
@@ -38,12 +40,6 @@ public class Employee implements Serializable {
     public Employee(String nickName, Integer age) {
         this.nickName = nickName;
         this.age = age;
-    }
-
-    public Employee(String nickName, Integer age, Double salary) {
-        this.nickName = nickName;
-        this.age = age;
-        this.salary = salary;
     }
 
     public Employee(String nickName, Integer age, Double salary, Status status) {
