@@ -1,7 +1,10 @@
 package com.zzdz;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.druid.pool.DruidDataSourceC3P0Adapter;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zaxxer.hikari.HikariDataSource;
 import com.zzdz.entity.Employee;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,11 +20,16 @@ import org.springframework.data.redis.core.SessionCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.sql.DataSource;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * @Classname RedisTest
@@ -44,8 +52,102 @@ public class RedisTest {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+
+    @Test
+    public void test() {
+        System.out.println(System.getProperties());
+        System.out.println("");
+    }
+
     @Test
     public void contextLoads() {
+
+        List<Employee> list = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            Employee employee = new Employee("zs" + i, 11 + i);
+            list.add(employee);
+        }
+
+        redisTemplate.opsForList().leftPushAll("list:test", list);
+
+        DruidDataSource dataSource = new DruidDataSource();
+        //dataSource.configFromPropety();
+
+    }
+
+    @Test
+    public void testHashWrite() {
+//        Map<String, String> map = new HashMap<>();
+//        for (int i = 0; i < 1000; i++) {
+//            map.put(UUID.randomUUID().toString(),UUID.randomUUID().toString());
+//        }
+
+        Instant sTime = Instant.now();
+
+        List<Object> objects = stringRedisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                String key = "user:";
+                for (int i = 0; i < 10000; i++) {
+                    Employee employee = new Employee("zs" + i, 11 + i);
+                    redisTemplate.opsForHash().put(key + i, "name", "joe" + i);
+                    redisTemplate.opsForHash().put(key + i, "age", "32");
+                    redisTemplate.opsForHash().put(key + i, "emp", JSON.toJSONString(employee));
+//                    redisTemplate.opsForHash().put(key + i, "map", JSON.toJSONString(map));
+//                    redisTemplate.opsForHash().putAll(key + i, map);
+                    redisTemplate.expire(key + i, 5, TimeUnit.MINUTES);
+                }
+                return null;
+            }
+        });
+
+//        String key = "user:";
+//        for (int i = 0; i < 10000; i++) {
+//            Employee employee = new Employee("zs"+i, 11+i);
+//            redisTemplate.opsForHash().put(key+i, "name", "joe"+i);
+//            redisTemplate.opsForHash().put(key+i, "age", "32");
+//            redisTemplate.opsForHash().put(key+i, "emp", JSON.toJSONString(employee));
+//            redisTemplate.opsForHash().put(key+i, "map", JSON.toJSONString(map));
+//            redisTemplate.opsForHash().putAll(key+i, map);
+//            redisTemplate.expire(key+i,10, TimeUnit.MINUTES);
+//        }
+
+        System.out.println("耗时：" +ChronoUnit.MILLIS.between(sTime,Instant.now()) );
+        System.out.println(objects);
+    }
+
+    @Test
+    public void testhashRead() {
+        List<String> keyList = new ArrayList<>(100);
+        for (int i = 0; i < 100; i++) {
+            String key = "user:" + i;
+            keyList.add(key);
+        }
+
+        Instant sTime = Instant.now();
+        List<Object> objectList = stringRedisTemplate.executePipelined(new SessionCallback<Object>() {
+            @Override
+            public <K, V> Object execute(RedisOperations<K, V> operations) throws DataAccessException {
+                for (String key : keyList) {
+//                    stringRedisTemplate.opsForValue().get(key);
+//                    redisTemplate.opsForValue().get(key);
+
+//                    redisTemplate.opsForHash().get(key,"emp");
+
+//                    redisTemplate.opsForHash().keys(key);
+
+//                    redisTemplate.opsForHash().values(key);
+
+                    redisTemplate.opsForHash().entries(key);
+                }
+                return null;
+            }
+        });
+        Instant eTime = Instant.now();
+        System.out.println("耗时：" + ChronoUnit.MILLIS.between(sTime,eTime) );
+        System.out.println(objectList);
+        System.out.println(objectList.get(0));
+        System.out.println(objectList.get(0).getClass());
     }
 
     @Test
@@ -108,7 +210,7 @@ public class RedisTest {
                 for (Employee e: employeeList) {
                     String key = "employees:" + e.getId();
 //                    stringRedisTemplate.opsForValue().set(key, JSONObject.toJSONString(e));
-                    redisTemplate.opsForValue().set(key,e);
+                    redisTemplate.opsForValue().set(key,e,3, TimeUnit.MINUTES);
                 }
                 return null;
             }
